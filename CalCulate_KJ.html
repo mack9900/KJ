@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Model — Store & 10% Increase</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 4px;
+    background: #f9f9f9;
+    color: #222;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 6px;
+    font-size: 16px;
+  }
+ .store-name-container {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  #storeName {
+    font-size: 28px;       /* BIGGER FONT */
+    font-weight: bold;     /* BOLD TEXT */
+    text-align: center;
+    padding: 6px 10px;
+    width: 80%;
+    max-width: 500px;
+    border: 2px solid #333;
+    border-radius: 6px;
+  }
+  
+  p.small {
+    text-align: center;
+    font-size: 10px;
+    margin-bottom: 10px;
+    color: #555;
+  }
+
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  table {
+    width: auto;
+    border-collapse: collapse;
+    margin: 0 auto;
+    table-layout: fixed;
+  }
+
+  td.header-col, th:nth-child(1) {
+    width: 150px;
+    text-align: left;
+  }
+
+  td:nth-child(2), th:nth-child(2),
+  td:nth-child(3), th:nth-child(3),
+  td:nth-child(4), th:nth-child(4) {
+    width: 100px;
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    padding: 4px 6px;
+    text-align: right;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  th {
+    background: #eee;
+    text-align: center;
+  }
+
+  td.header-col {
+    font-weight: bold;
+    background: #f3f3f3;
+    text-align: left;
+    cursor: default;
+  }
+
+  input[type="number"] {
+    width: 120px;
+    padding: 4px;
+    box-sizing: border-box;
+    text-align: right;
+    font-size: 12px;
+  }
+
+  .note {
+    font-size: 11px;
+    color: #666;
+    text-align: left;
+  }
+
+  .highlight {
+    background-color: #ffeb3b;
+    font-weight: bold;
+    color: #000;
+  }
+
+  .collapse-btn {
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 4px;
+  }
+
+  /* Tablet */
+  @media (max-width: 768px) {
+    th, td {
+      font-size: 11px;
+      padding: 4px;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 480px) {
+    h2 {
+      font-size: 14px;
+    }
+    th, td {
+      font-size: 10px;
+      padding: 3px;
+    }
+    input[type="number"] {
+      font-size: 10px;
+      width: 80px;
+    }
+  }
+</style>
+</head>
+<body>
+  <h2>Finance Model — Store & 10% Increase</h2>
+   <div class="store-name-container">
+    <input type="text" id="storeName" placeholder="Enter Store Name" oninput="updateStoreName()">
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>HEADER</th>
+          <th>INPUTS</th>
+          <th>Current</th>
+          <th>10%+</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="header-col">Investment (INV)</td>
+          <td><input id="INV" type="number" step="0.01" placeholder="e.g. 5000.00" oninput="recalc()"></td>
+          <td id="STORE_INV">0.00</td>
+          <td id="INC_INV">0.00</td>
+        </tr>
+        <tr>
+          <td class="header-col">Turnover (TO)</td>
+          <td><input id="TO" type="number" step="0.01" placeholder="e.g. 10000.00" oninput="recalc()"></td>
+          <td id="STORE_TO">0.00</td>
+          <td id="INC_TO">0.00</td>
+        </tr>
+        <tr>
+          <td class="header-col">GP (%)</td>
+          <td>
+            <input id="GP" type="number" step="0.01" placeholder="e.g. 7.5" oninput="recalc()">
+            <div class="note">(e.g 7.5)</div>
+          </td>
+          <td id="STORE_GP">0.00</td>
+          <td id="INC_GP">0.00</td>
+        </tr>
+
+        <!-- Collapsible rows start -->
+        <tr class="header-col collapsible">
+          <td colspan="4"><span class="collapse-btn" onclick="toggleCollapse()">+</span> Additional Details</td>
+        </tr>
+
+        <tr class="collapsible-row">
+          <td class="header-col">AMC</td>
+          <td><input id="AMC" type="number" step="0.01"  value="50" placeholder="e.g. 12000.00" oninput="recalc()"></td>
+          <td id="STORE_AMC">0.00</td>
+          <td id="INC_AMC">0.00</td>
+        </tr>
+        <tr class="highlight">
+          <td class="header-col">Store EBITA - ACTUAL</td>
+          <td>—</td>
+          <td id="STORE_EBITA">0.00</td>
+          <td id="INC_EBITA">0.00</td>
+        </tr>
+        <tr class="highlight">
+          <td class="header-col">EBITDA %</td>
+          <td>—</td>
+          <td id="STORE_EBITDA_PCT">0.00%</td>
+          <td id="INC_EBITDA_PCT">0.00%</td>
+        </tr>
+        <tr >
+          <td class="header-col">Bank Investment % (BINV)</td>
+          <td>
+            <input id="BINV" type="number" step="0.01"  value="90" placeholder="e.g. 90" oninput="recalc()">
+            <div class="note">(e.g. 90)</div>
+          </td>
+          <td id="STORE_BINV_AMT">0.00</td>
+          <td id="INC_BINV_AMT">0.00</td>
+        </tr>
+        <tr class="collapsible-row">
+          <td class="header-col">Bank Interest % (BI)</td>
+          <td>
+            <input id="BI" type="number" step="0.01"  value="9" placeholder="e.g. 9" oninput="recalc()">
+            <div class="note">(e.g. 9)</div>
+          </td>
+          <td id="STORE_BANK_INT_AMT">0.00</td>
+          <td id="INC_BANK_INT_AMT">0.00</td>
+        </tr>
+        <tr class="highlight">
+          <td class="header-col">PBT</td>
+          <td>—</td>
+          <td id="STORE_PBT">0.00</td>
+          <td id="INC_PBT">0.00</td>
+        </tr>
+        <tr class="collapsible-row">
+          <td class="header-col">Our Investment</td>
+          <td>—</td>
+          <td id="STORE_OUR_INV">0.00</td>
+          <td id="INC_OUR_INV">0.00</td>
+        </tr>
+        <tr class="highlight">
+          <td class="header-col">ROI</td>
+          <td>—</td>
+          <td id="STORE_ROI">0.00%</td>
+          <td id="INC_ROI">0.00%</td>
+        </tr>
+        <tr class="highlight">
+          <td class="header-col">ROCE</td>
+          <td>—</td>
+          <td id="STORE_ROCE">0.00%</td>
+          <td id="INC_ROCE">0.00%</td>
+        </tr>
+        <tr class="highlight">
+          <td class="header-col">Payback Period</td>
+          <td>—</td>
+          <td id="STORE_PAYBACK">0.00</td>
+          <td id="INC_PAYBACK">0.00</td>
+        </tr>
+        <tr class="collapsible-row">
+          <td class="header-col">TAX %</td>
+          <td><input id="TAX" type="number" step="0.01" value="0" placeholder="e.g. 30" oninput="recalc()"></td>
+          <td id="STORE_TAX_AMT">0.00</td>
+          <td id="INC_TAX_AMT">0.00</td>
+        </tr>
+        <tr class="collapsible-row">
+          <td class="header-col">PAT</td>
+          <td>—</td>
+          <td id="STORE_PAT">0.00</td>
+          <td id="INC_PAT">0.00</td>
+        </tr>
+        <tr class="collapsible-row">
+          <td class="header-col">Our Interest</td>
+          <td>
+            <input id="INT" type="number" step="0.01"  value="4" placeholder="e.g. 4" oninput="recalc()">
+            <div class="note">(e.g. 4)</div>
+          </td>
+          <td id="STORE_OUR_INT">0.00</td>
+          <td id="INC_OUR_INT">0.00</td>
+        </tr>
+        <tr class="collapsible-row">
+          <td class="header-col">Net Off</td>
+          <td>—</td>
+          <td id="STORE_NET_OFF">0.00</td>
+          <td id="INC_NET_OFF">0.00</td>
+        </tr>
+        <!-- Collapsible rows end -->
+
+      </tbody>
+    </table>
+    <button class="calc-btn" onclick="recalc()">Calculate</button>
+  </div>
+
+<script>
+  // Existing calculation functions
+  function val(id){ return parseFloat(document.getElementById(id).value) || 0; }
+  function money(v){
+    if (!Number.isFinite(v)) return "0.00";
+    let x = v.toFixed(2).split(".");
+    let lastThree = x[0].slice(-3);
+    let otherNumbers = x[0].slice(0, -3);
+    if(otherNumbers !== '') {
+      lastThree = ',' + lastThree;
+      otherNumbers = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",");
+    }
+    return otherNumbers + lastThree + "." + x[1];
+  }
+  function pct(v){ return (Number.isFinite(v) ? v.toFixed(2) + "%" : "0.00%"); }
+
+  function computeForTurnover(to, inv, gp_pct, amc, binv_pct, bi_pct, tax_pct, int_pct){
+    const gp_amount = to * gp_pct;
+    const ebita = gp_amount - amc;
+    const ebitda_pct = (to !== 0) ? (ebita / to * 100) : 0;
+    const bank_invest_amt = inv * binv_pct;
+    const bank_interest_amt = bank_invest_amt * bi_pct;
+    const pbt = ebita - bank_interest_amt;
+    const tax_amt = pbt * tax_pct;
+    const pat = pbt - tax_amt;
+    const roi = (inv !== 0) ? (pat / inv * 1000) : 0;
+    const roce = (inv !== 0) ? (ebita / inv * 100) : 0;
+    const payback = (roce !== 0) ? (100 / roce) : 0;
+    const our_invest = inv * (1 - binv_pct);
+    const our_interest = our_invest * int_pct;
+    const net_off = pbt - tax_amt - our_interest;
+    return { gp_amount, ebita, ebitda_pct, bank_invest_amt, bank_interest_amt,
+             pbt, tax_amt, pat, roi, roce, payback, our_invest, our_interest, net_off };
+  }
+
+  function recalc(){
+    const inv = val("INV");
+    const to = val("TO");
+    const gp_pct = val("GP") / 100.0;
+    const amc = val("AMC");
+    const binv_pct = val("BINV") / 100.0;
+    const bi_pct = val("BI") / 100.0;
+    const tax_pct = val("TAX") / 100.0;
+    const int_pct = val("INT") / 100.0;
+    const to_inc = to * 1.10;
+
+    const store = computeForTurnover(to, inv, gp_pct, amc, binv_pct, bi_pct, tax_pct, int_pct);
+    const inc = computeForTurnover(to_inc, inv, gp_pct, amc, binv_pct, bi_pct, tax_pct, int_pct);
+
+    document.getElementById("STORE_INV").innerText = money(inv);
+    document.getElementById("STORE_TO").innerText = money(to);
+    document.getElementById("STORE_GP").innerText = money(store.gp_amount);
+    document.getElementById("STORE_AMC").innerText = "-" + money(amc);
+    document.getElementById("STORE_EBITA").innerText = money(store.ebita);
+    document.getElementById("STORE_EBITDA_PCT").innerText = pct(store.ebitda_pct);
+    document.getElementById("STORE_BINV_AMT").innerText = money(store.bank_invest_amt);
+    document.getElementById("STORE_BANK_INT_AMT").innerText = money(store.bank_interest_amt);
+    document.getElementById("STORE_PBT").innerText = money(store.pbt);
+    document.getElementById("STORE_TAX_AMT").innerText = money(store.tax_amt);
+    document.getElementById("STORE_PAT").innerText = money(store.pat);
+    document.getElementById("STORE_ROI").innerText = pct(store.roi);
+    document.getElementById("STORE_ROCE").innerText = pct(store.roce);
+    document.getElementById("STORE_PAYBACK").innerText = money(store.payback);
+    document.getElementById("STORE_OUR_INV").innerText = money(store.our_invest);
+    document.getElementById("STORE_OUR_INT").innerText = money(store.our_interest);
+    document.getElementById("STORE_NET_OFF").innerText = money(store.net_off);
+
+    document.getElementById("INC_INV").innerText = money(inv);
+    document.getElementById("INC_TO").innerText = money(to_inc);
+    document.getElementById("INC_GP").innerText = money(inc.gp_amount);
+    document.getElementById("INC_AMC").innerText = "-" + money(amc);
+    document.getElementById("INC_EBITA").innerText = money(inc.ebita);
+    document.getElementById("INC_EBITDA_PCT").innerText = pct(inc.ebitda_pct);
+    document.getElementById("INC_BINV_AMT").innerText = money(inc.bank_invest_amt);
+    document.getElementById("INC_BANK_INT_AMT").innerText = money(inc.bank_interest_amt);
+    document.getElementById("INC_PBT").innerText = money(inc.pbt);
+    document.getElementById("INC_TAX_AMT").innerText = money(inc.tax_amt);
+    document.getElementById("INC_PAT").innerText = money(inc.pat);
+    document.getElementById("INC_ROI").innerText = pct(inc.roi);
+    document.getElementById("INC_ROCE").innerText = pct(inc.roce);
+    document.getElementById("INC_PAYBACK").innerText = money(inc.payback);
+    document.getElementById("INC_OUR_INV").innerText = money(inc.our_invest);
+    document.getElementById("INC_OUR_INT").innerText = money(inc.our_interest);
+    document.getElementById("INC_NET_OFF").innerText = money(inc.net_off);
+  }
+
+  // Collapse/Expand functionality
+  function toggleCollapse(){
+    const rows = document.querySelectorAll('.collapsible-row');
+    const btn = document.querySelector('.collapse-btn');
+    const collapsed = rows[0].style.display !== "table-row";
+    rows.forEach(r => r.style.display = collapsed ? "table-row" : "none");
+    btn.innerText = collapsed ? "-" : "+";
+  }
+
+  // On page load, collapse rows
+  window.onload = function(){
+    const rows = document.querySelectorAll('.collapsible-row');
+    rows.forEach(r => r.style.display = "none");
+    recalc();
+  }
+</script>
+</body>
+</html>
