@@ -303,7 +303,7 @@
     const pbt = ebita - bank_interest_amt;
     const tax_amt = pbt * tax_pct;
     const pat = pbt - tax_amt;
-    const roi = (inv !== 0) ? (pat / inv * 1000) : 0;
+    const roi = (inv !== 0) ? (pat / inv * 100) : 0;
     const roce = (inv !== 0) ? (ebita / inv * 100) : 0;
     const payback = (roce !== 0) ? (100 / roce) : 0;
     const our_invest = inv * (1 - binv_pct);
@@ -382,3 +382,4 @@
 </script>
 </body>
 </html>
+
