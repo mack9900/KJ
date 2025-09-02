@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finance Model — Store & 10% Increase</title>
+  <title>Finance Model — Store & % Increase</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -110,6 +110,12 @@
     margin-right: 4px;
   }
 
+  .header-input {
+    width: 50px;
+    font-size: 11px;
+    text-align: center;
+  }
+
   /* Tablet */
   @media (max-width: 768px) {
     th, td {
@@ -135,7 +141,7 @@
 </style>
 </head>
 <body>
-  <h2>Finance Model — Store & 10% Increase</h2>
+  <h2>Finance Model — Store & % Increase</h2>
    <div class="store-name-container">
     <input type="text" id="storeName" placeholder="Enter Store Name" oninput="updateStoreName()">
   </div>
@@ -147,7 +153,9 @@
           <th>HEADER</th>
           <th>INPUTS</th>
           <th>Current</th>
-          <th>10%+</th>
+          <th>
+            <input id="INC_PCT" type="number" value="10" step="0.1" class="header-input" oninput="recalc()">%
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -303,8 +311,8 @@
     const pbt = ebita - bank_interest_amt;
     const tax_amt = pbt * tax_pct;
     const pat = pbt - tax_amt;
-     const our_invest = inv * (1 - binv_pct);
-    const roi = (inv !== 0) ? (pbt / our_invest * 100) : 0;
+    const our_invest = inv * (1 - binv_pct);
+    const roi = (our_invest !== 0) ? (pat / our_invest * 100) : 0;
     const roce = (inv !== 0) ? (ebita / inv * 100) : 0;
     const payback = (roce !== 0) ? (100 / roce) : 0;
     const our_interest = our_invest * int_pct;
@@ -322,7 +330,9 @@
     const bi_pct = val("BI") / 100.0;
     const tax_pct = val("TAX") / 100.0;
     const int_pct = val("INT") / 100.0;
-    const to_inc = to * 1.10;
+    const inc_pct = val("INC_PCT") / 100.0;
+
+    const to_inc = to * (1 + inc_pct);
 
     const store = computeForTurnover(to, inv, gp_pct, amc, binv_pct, bi_pct, tax_pct, int_pct);
     const inc = computeForTurnover(to_inc, inv, gp_pct, amc, binv_pct, bi_pct, tax_pct, int_pct);
@@ -382,7 +392,3 @@
 </script>
 </body>
 </html>
-
-
-
-
